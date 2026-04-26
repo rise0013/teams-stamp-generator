@@ -130,18 +130,3 @@ GIF生成には `gif.js` を使用しています。
 - APIキー、認証情報、社内資料、機密情報などをリポジトリやスタンプ内容に含めないでください。
 - 外部CDNに依存するため、企業環境で利用する場合は、通信先の許可や社内ポリシーを確認してください。
 
-## 公開サイト
-
-GitHub Pagesで公開している場合、サイトURLは通常次の形式になります。
-
-```text
-https://<GitHubユーザー名>.github.io/<リポジトリ名>/
-```
-
-例:
-
-```text
-https://yourname.github.io/teams-stamp-generator/
-```
-
-GitHub上では、リポジトリの `Settings` → `Pages` から公開URLを確認できます。
