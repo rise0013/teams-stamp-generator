@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teamsスタンプジェネレーター</title>
+  <meta name="description" content="Microsoft Teams向けの透過PNG/GIFスタンプをブラウザだけで作成するツールです。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>Teamsスタンプジェネレーター</h1>
+        <p class="lead">Teams向けの正方形PNG/GIFを、ブラウザだけで作成します。</p>
+      </div>
+      <div class="header-actions">
+        <button class="ghost-button" id="resetButton" type="button">初期化</button>
+        <button class="primary-button" id="downloadButton" type="button">PNGで保存</button>
+        <button class="ghost-button" id="downloadGifButton" type="button" disabled>GIFで保存</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel controls-panel" aria-label="スタンプ設定">
+        <form id="controls" autocomplete="off">
+          <div class="section-block compact-block">
+            <div class="section-title-row">
+              <h2>基本設定</h2>
+              <span class="mini-label">よく使う項目</span>
+            </div>
+
+            <label class="field-label" for="stampText">テキスト</label>
+            <textarea id="stampText" rows="2" maxlength="28" placeholder="例：承知&#10;しました">承知
+しました</textarea>
+            <div class="hint-row">
+              <span>改行可。短い言葉ほど見やすくなります。</span>
+              <span id="charCount">7 / 28</span>
+            </div>
+
+            <div class="section-title-row top-gap">
+              <h2>フォント</h2>
+              <button class="text-button" id="toggleMoreFonts" type="button" aria-expanded="false">その他のフォントを表示</button>
+            </div>
+            <div class="font-grid" id="featuredFontGrid" aria-label="おすすめフォント"></div>
+            <div class="more-fonts" id="moreFonts" hidden>
+              <p class="mini-label">日本語表示に対応した追加フォント</p>
+              <div class="font-grid compact" id="extraFontGrid"></div>
+            </div>
+
+            <div class="row-two compact-top">
+              <label class="field-label range-field" for="fontSize">
+                <span>文字サイズ</span>
+                <span class="range-value"><span id="fontSizeValue">100</span>px</span>
+                <input id="fontSize" type="range" min="20" max="220" value="100" />
+              </label>
+              <label class="switch-field short">
+                <input id="boldToggle" type="checkbox" checked />
+                <span>太字</span>
+              </label>
+            </div>
+
+            <div class="row-two compact-top">
+              <label class="field-label range-field" for="letterSpacing">
+                <span>字間</span>
+                <span class="range-value"><span id="letterSpacingValue">0</span>px</span>
+                <input id="letterSpacing" type="range" min="-20" max="24" value="0" />
+              </label>
+              <label class="field-label range-field" for="lineGap">
+                <span>行間</span>
+                <span class="range-value"><span id="lineGapValue">0</span>px</span>
+                <input id="lineGap" type="range" min="-30" max="40" value="0" />
+              </label>
+            </div>
+
+            <div class="auto-fit-grid compact-top">
+              <label class="switch-field full">
+                <input id="fitWidth" type="checkbox" checked />
+                <span>横幅自動調整</span>
+              </label>
+              <label class="switch-field full">
+                <input id="fitHeight" type="checkbox" checked />
+                <span>縦幅自動調整</span>
+              </label>
+            </div>
+            <p class="note compact-top">はみ出す場合は、文字サイズは維持したまま横方向・縦方向に圧縮して収めます。</p>
+          </div>
+
+          <div class="section-block compact-block">
+            <h2>文字色</h2>
+            <div class="segmented" role="group" aria-label="文字色タイプ">
+              <label>
+                <input type="radio" name="textFillMode" value="solid" checked />
+                <span>単色</span>
+              </label>
+              <label>
+                <input type="radio" name="textFillMode" value="gradient" />
+                <span>グラデーション</span>
+              </label>
+            </div>
+
+            <div id="solidColorControls" class="color-controls">
+              <div class="color-tool">
+                <div class="color-tool-head">
+                  <span>文字色</span>
+                  <span class="color-chip" id="solidColorChip"></span>
+                </div>
+                <div class="preset-row solid-row" id="solidPresets" aria-label="文字色プリセット"></div>
+                <details class="color-more">
+                  <summary>その他の色を作る</summary>
+                  <div class="color-custom">
+                    <input id="solidColor" type="color" value="#1f2937" aria-label="文字色を自由に選択" />
+                    <input id="solidColorHex" type="text" value="#1f2937" maxlength="7" inputmode="text" aria-label="文字色のHEX値" />
+                  </div>
+                </details>
+              </div>
+            </div>
+
+            <div id="textGradientControls" class="gradient-controls" hidden>
+              <div class="gradient-preview" id="textGradientPreview" aria-hidden="true"></div>
+              <div class="color-pair">
+                <div class="color-tool">
+                  <div class="color-tool-head">
+                    <span>開始色</span>
+                    <span class="color-chip" id="textGradientStartChip"></span>
+                  </div>
+                  <div class="preset-row solid-row" id="textGradientStartPresets" aria-label="文字開始色プリセット"></div>
+                  <details class="color-more">
+                    <summary>その他の色を作る</summary>
+                    <div class="color-custom">
+                      <input id="textGradientStart" type="color" value="#ff4d8d" aria-label="文字開始色を自由に選択" />
+                      <input id="textGradientStartHex" type="text" value="#ff4d8d" maxlength="7" aria-label="文字開始色のHEX値" />
+                    </div>
+                  </details>
+                </div>
+                <div class="color-tool">
+                  <div class="color-tool-head">
+                    <span>終了色</span>
+                    <span class="color-chip" id="textGradientEndChip"></span>
+                  </div>
+                  <div class="preset-row solid-row" id="textGradientEndPresets" aria-label="文字終了色プリセット"></div>
+                  <details class="color-more">
+                    <summary>その他の色を作る</summary>
+                    <div class="color-custom">
+                      <input id="textGradientEnd" type="color" value="#ffbf1f" aria-label="文字終了色を自由に選択" />
+                      <input id="textGradientEndHex" type="text" value="#ffbf1f" maxlength="7" aria-label="文字終了色のHEX値" />
+                    </div>
+                  </details>
+                </div>
+              </div>
+              <div class="inline-fields">
+                <label class="select-field">
+                  <span>方向</span>
+                  <select id="textGradientDirection">
+                    <option value="left-right">左 → 右</option>
+                    <option value="top-bottom">上 → 下</option>
+                    <option value="diagonal-down">左上 → 右下</option>
+                    <option value="diagonal-up">左下 → 右上</option>
+                  </select>
+                </label>
+                <button class="ghost-button small" id="swapTextGradient" type="button">色を入替</button>
+              </div>
+              <div class="preset-row" id="textGradientPresets" aria-label="文字グラデーションプリセット"></div>
+            </div>
+          </div>
+
+          <details class="advanced">
+            <summary>(オプション)詳細設定</summary>
+            <div class="advanced-content">
+              <div class="section-block compact-block">
+                <h2>背景</h2>
+                <label class="switch-field full">
+                  <input id="transparentBg" type="checkbox" checked />
+                  <span>背景を透過する</span>
+                </label>
+                <div class="segmented compact-top" role="group" aria-label="背景色タイプ">
+                  <label>
+                    <input type="radio" name="backgroundFillMode" value="solid" checked />
+                    <span>単色</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="backgroundFillMode" value="gradient" />
+                    <span>グラデーション</span>
+                  </label>
+                </div>
+
+                <div id="backgroundSolidControls" class="color-controls compact-top">
+                  <div class="color-tool compact-color">
+                    <div class="color-tool-head">
+                      <span>背景色</span>
+                      <span class="color-chip" id="backgroundColorChip"></span>
+                    </div>
+                    <div class="preset-row solid-row" id="backgroundPresets" aria-label="背景色プリセット"></div>
+                    <details class="color-more">
+                      <summary>その他の色を作る</summary>
+                      <div class="color-custom">
+                        <input id="backgroundColor" type="color" value="#ffffff" aria-label="背景色を自由に選択" />
+                        <input id="backgroundColorHex" type="text" value="#ffffff" maxlength="7" inputmode="text" aria-label="背景色のHEX値" />
+                      </div>
+                    </details>
+                  </div>
+                </div>
+
+                <div id="backgroundGradientControls" class="gradient-controls compact-top background-gradient-controls" hidden>
+                  <div class="gradient-preview" id="backgroundGradientPreview" aria-hidden="true"></div>
+                  <div class="color-pair">
+                    <div class="color-tool">
+                      <div class="color-tool-head">
+                        <span>開始色</span>
+                        <span class="color-chip" id="backgroundGradientStartChip"></span>
+                      </div>
+                      <div class="preset-row solid-row" id="backgroundGradientStartPresets"></div>
+                      <details class="color-more">
+                        <summary>その他の色を作る</summary>
+                        <div class="color-custom">
+                          <input id="backgroundGradientStart" type="color" value="#ffffff" />
+                          <input id="backgroundGradientStartHex" type="text" value="#ffffff" maxlength="7" />
+                        </div>
+                      </details>
+                    </div>
+                    <div class="color-tool">
+                      <div class="color-tool-head">
+                        <span>終了色</span>
+                        <span class="color-chip" id="backgroundGradientEndChip"></span>
+                      </div>
+                      <div class="preset-row solid-row" id="backgroundGradientEndPresets"></div>
+                      <details class="color-more">
+                        <summary>その他の色を作る</summary>
+                        <div class="color-custom">
+                          <input id="backgroundGradientEnd" type="color" value="#dbeafe" />
+                          <input id="backgroundGradientEndHex" type="text" value="#dbeafe" maxlength="7" />
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                  <div class="inline-fields">
+                    <label class="select-field">
+                      <span>方向</span>
+                      <select id="backgroundGradientDirection">
+                        <option value="left-right">左 → 右</option>
+                        <option value="top-bottom">上 → 下</option>
+                        <option value="diagonal-down">左上 → 右下</option>
+                        <option value="diagonal-up">左下 → 右上</option>
+                      </select>
+                    </label>
+                    <button class="ghost-button small" id="swapBackgroundGradient" type="button">色を入替</button>
+                  </div>
+                  <div class="preset-row" id="backgroundGradientPresets"></div>
+                </div>
+
+                <div class="inline-fields compact-top split-advanced">
+                  <label class="select-field narrow">
+                    <span>形状</span>
+                    <select id="backgroundShape">
+                      <option value="none">なし</option>
+                      <option value="square">四角</option>
+                      <option value="rounded" selected>角丸四角</option>
+                      <option value="pill">かなり丸い</option>
+                      <option value="circle">円</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="field-label range-field compact-top" for="cornerRadius">
+                  <span>角丸</span>
+                  <span class="range-value"><span id="cornerRadiusValue">18</span>%</span>
+                  <input id="cornerRadius" type="range" min="0" max="40" value="18" />
+                </label>
+              </div>
+
+              <div class="section-block compact-block">
+                <h2>装飾</h2>
+                <label class="switch-field full">
+                  <input id="strokeToggle" type="checkbox" />
+                  <span>文字の縁取り</span>
+                </label>
+                <div class="stroke-controls compact-top" id="strokeControls">
+                  <div class="color-tool">
+                    <div class="color-tool-head">
+                      <span>縁色</span>
+                      <span class="color-chip" id="strokeColorChip"></span>
+                    </div>
+                    <div class="preset-row solid-row" id="strokePresets"></div>
+                    <details class="color-more">
+                      <summary>その他の色を作る</summary>
+                      <div class="color-custom">
+                        <input id="strokeColor" type="color" value="#ffffff" />
+                        <input id="strokeColorHex" type="text" value="#ffffff" maxlength="7" />
+                      </div>
+                    </details>
+                  </div>
+                </div>
+                <label class="field-label range-field compact-top" for="strokeWidth">
+                  <span>文字縁の太さ</span>
+                  <span class="range-value"><span id="strokeWidthValue">5</span>px</span>
+                  <input id="strokeWidth" type="range" min="1" max="18" value="5" />
+                </label>
+
+                <label class="switch-field full compact-top">
+                  <input id="frameOutlineToggle" type="checkbox" />
+                  <span>スタンプ全体の縁取り</span>
+                </label>
+                <div class="stroke-controls compact-top" id="frameOutlineControls">
+                  <div class="color-tool">
+                    <div class="color-tool-head">
+                      <span>縁色</span>
+                      <span class="color-chip" id="frameOutlineColorChip"></span>
+                    </div>
+                    <div class="preset-row solid-row" id="frameOutlinePresets"></div>
+                    <details class="color-more">
+                      <summary>その他の色を作る</summary>
+                      <div class="color-custom">
+                        <input id="frameOutlineColor" type="color" value="#4f46e5" />
+                        <input id="frameOutlineColorHex" type="text" value="#4f46e5" maxlength="7" />
+                      </div>
+                    </details>
+                  </div>
+                </div>
+                <label class="field-label range-field compact-top" for="frameOutlineWidth">
+                  <span>外枠の太さ</span>
+                  <span class="range-value"><span id="frameOutlineWidthValue">6</span>px</span>
+                  <input id="frameOutlineWidth" type="range" min="2" max="22" value="6" />
+                </label>
+
+                <label class="switch-field full compact-top">
+                  <input id="shadowToggle" type="checkbox" checked />
+                  <span>影をつける</span>
+                </label>
+                <label class="field-label range-field compact-top" for="shadowBlur">
+                  <span>影のぼかし</span>
+                  <span class="range-value"><span id="shadowBlurValue">10</span>px</span>
+                  <input id="shadowBlur" type="range" min="0" max="24" value="10" />
+                </label>
+              </div>
+
+              <div class="section-block compact-block">
+                <h2>図形プリセット</h2>
+                <div class="inline-fields split-advanced">
+                  <label class="select-field">
+                    <span>マーク</span>
+                    <select id="iconPreset">
+                      <option value="none">なし</option>
+                      <option value="smile">ニコちゃん</option>
+                      <option value="sparkle">キラキラ</option>
+                      <option value="star">星</option>
+                      <option value="heart">ハート</option>
+                      <option value="check">チェック</option>
+                      <option value="bang">びっくり</option>
+                      <option value="bubble">吹き出し</option>
+                    </select>
+                  </label>
+                  <label class="select-field">
+                    <span>配置</span>
+                    <select id="iconLayout">
+                      <option value="corner">右上</option>
+                      <option value="behind">背景に大きく</option>
+                      <option value="center">中央</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="section-block compact-block">
+                <h2>出力</h2>
+                <label class="select-field narrow">
+                  <span>PNGサイズ</span>
+                  <select id="outputSize">
+                    <option value="128">128 × 128</option>
+                    <option value="256" selected>256 × 256</option>
+                    <option value="512">512 × 512</option>
+                    <option value="768">768 × 768</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <details class="advanced animation-panel">
+            <summary>(オプション)アニメーション</summary>
+            <div class="advanced-content">
+              <div class="section-block compact-block">
+                <label class="switch-field full">
+                  <input id="animationEnabled" type="checkbox" />
+                  <span>GIFアニメーションを有効にする</span>
+                </label>
+                <p class="note compact-top">Teams向けに、GIF書き出しは最大256×256・軽量寄りの設定で出力します。環境によってはGIF出力を自動で失敗扱いにします。</p>
+              </div>
+
+              <div class="section-block compact-block">
+                <h2>アニメーション内容</h2>
+                <label class="switch-field full">
+                  <input id="animateTextGradient" type="checkbox" checked />
+                  <span>文字グラデーションを動かす</span>
+                </label>
+                <label class="switch-field full compact-top">
+                  <input id="animateBackgroundGradient" type="checkbox" checked />
+                  <span>背景グラデーションを動かす</span>
+                </label>
+                <div class="inline-fields compact-top split-advanced">
+                  <label class="select-field">
+                    <span>スタンプ外枠エフェクト</span>
+                    <select id="frameEffect">
+                      <option value="none">なし</option>
+                      <option value="gold-sparkle">黄金キラキラ</option>
+                      <option value="marquee-red">リレー風に回る（赤）</option>
+                      <option value="marquee-blue">リレー風に回る（青）</option>
+                      <option value="marquee-green">リレー風に回る（緑）</option>
+                    </select>
+                  </label>
+                  <label class="select-field">
+                    <span>文字エフェクト</span>
+                    <select id="textEffect">
+                      <option value="none">なし</option>
+                      <option value="wobble">ゆれる</option>
+                      <option value="blink">点滅</option>
+                      <option value="pulse">拡大縮小</option>
+                      <option value="float">ふわふわ</option>
+                      <option value="shake">ブルブル</option>
+                      <option value="wave">うねる</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="section-block compact-block">
+                <h2>GIF品質</h2>
+                <div class="row-two">
+                  <label class="select-field">
+                    <span>フレーム数</span>
+                    <select id="gifFrames">
+                      <option value="8">8</option>
+                      <option value="10" selected>10</option>
+                      <option value="12">12</option>
+                      <option value="16">16</option>
+                    </select>
+                  </label>
+                  <label class="select-field">
+                    <span>FPS</span>
+                    <select id="gifFps">
+                      <option value="6">6</option>
+                      <option value="8" selected>8</option>
+                      <option value="10">10</option>
+                      <option value="12">12</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </details>
+        </form>
+      </section>
+
+      <section class="panel preview-panel" aria-label="プレビュー">
+        <div class="preview-header">
+          <div>
+            <h2>リアルタイムプレビュー</h2>
+            <p>枠線がスタンプ全体の出力範囲です。</p>
+          </div>
+          <div class="status-pill" id="fileEstimate">PNG: 計算中</div>
+        </div>
+
+        <div class="preview-stage">
+          <div class="stamp-frame">
+            <div class="checkerboard">
+              <canvas id="stampCanvas" width="256" height="256" aria-label="作成中のスタンププレビュー"></canvas>
+            </div>
+            <div class="frame-label">スタンプ範囲</div>
+          </div>
+        </div>
+
+        <div class="preview-footer">
+          <div>
+            <strong id="selectedFontName">M PLUS Rounded 1c</strong>
+            <span id="previewMeta">256 × 256 PNG</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>
