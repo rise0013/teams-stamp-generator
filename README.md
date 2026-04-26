@@ -145,3 +145,18 @@ https://yourname.github.io/teams-stamp-generator/
 ```
 
 GitHub上では、リポジトリの `Settings` → `Pages` から公開URLを確認できます。
+
+## 利用状況の計測について
+
+このサイトでは、利用状況の把握と改善のため Google Analytics を利用しています。  
+ページの閲覧状況などの利用情報が、Cookie等を通じてGoogleに送信される場合があります。
+
+主な外部通信先は以下です。
+
+- `fonts.googleapis.com` / `fonts.gstatic.com`: Google Fonts
+- `cdnjs.cloudflare.com`: GIF生成ライブラリ
+- `www.googletagmanager.com`: Google Analyticsタグ
+- `google-analytics.com`: Google Analyticsの計測通信
+
+詳しくは、サイト下部のプライバシーポリシーをご確認ください。
+

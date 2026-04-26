@@ -675,3 +675,35 @@ input[type="color"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* Public site notice / privacy policy */
+.site-notice {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.site-notice section + section {
+  margin-top: 10px;
+}
+
+.site-notice h2 {
+  margin: 0 0 4px;
+  color: #475467;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.site-notice p {
+  margin: 3px 0;
+}
+
+.site-notice a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
