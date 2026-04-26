@@ -405,3 +405,273 @@ input[type="color"] {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* v11: smartphone responsive layout.
+   Existing desktop layout and functions are unchanged; this block only overrides layout on narrow screens. */
+@media (max-width: 900px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+  }
+
+  body {
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.12), transparent 20rem),
+      radial-gradient(circle at 100% 10%, rgba(236, 72, 153, 0.1), transparent 18rem),
+      var(--bg);
+  }
+
+  .app-shell {
+    width: min(100%, calc(100vw - 20px));
+    height: auto;
+    min-height: 100svh;
+    padding: 10px 0 16px;
+    gap: 10px;
+  }
+
+  .app-header {
+    min-height: 0;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 22px;
+    line-height: 1.15;
+  }
+
+  .lead {
+    font-size: 12px;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .primary-button,
+  .ghost-button {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .preview-panel {
+    order: -1;
+    padding: 12px;
+    border-radius: 18px;
+    gap: 10px;
+  }
+
+  .preview-header {
+    gap: 8px;
+  }
+
+  .preview-header h2 {
+    font-size: 14px;
+  }
+
+  .preview-header p {
+    font-size: 11px;
+  }
+
+  .status-pill {
+    padding: 6px 9px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .preview-stage {
+    min-height: 0;
+  }
+
+  .stamp-frame {
+    width: min(62vw, 230px);
+    padding: 9px;
+    border-radius: 18px;
+  }
+
+  .checkerboard {
+    border-radius: 14px;
+    background-size: 18px 18px;
+    background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+  }
+
+  .frame-label {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .preview-footer {
+    padding-top: 10px;
+  }
+
+  .controls-panel {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  #controls {
+    gap: 10px;
+  }
+
+  .section-block {
+    padding: 10px 0;
+  }
+
+  .section-title-row,
+  .hint-row {
+    gap: 8px;
+  }
+
+  textarea {
+    min-height: 76px;
+    font-size: 16px; /* avoid iOS auto-zoom */
+  }
+
+  select,
+  input[type="text"],
+  input[type="color"] {
+    font-size: 16px; /* avoid iOS auto-zoom */
+  }
+
+  .font-grid,
+  .font-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .font-tile {
+    min-height: 54px;
+    padding: 8px;
+  }
+
+  .font-sample {
+    font-size: 16px;
+  }
+
+  .font-name {
+    font-size: 10px;
+  }
+
+  .row-two,
+  .inline-fields,
+  .color-pair,
+  .split-advanced {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .auto-fit-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .switch-field {
+    min-height: 42px;
+  }
+
+  .segmented {
+    gap: 8px;
+  }
+
+  .segmented span {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .preset-row,
+  .solid-row,
+  .background-gradient-controls .preset-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .gradient-preset,
+  .solid-preset {
+    height: 30px;
+  }
+
+  .color-custom {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .color-tool-head {
+    font-size: 12px;
+  }
+
+  .color-chip {
+    width: 48px;
+    height: 22px;
+  }
+
+  .advanced summary {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .select-field.narrow {
+    max-width: none;
+  }
+
+  .background-gradient-controls .color-pair,
+  .background-gradient-controls .inline-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .ghost-button.small {
+    width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-shell {
+    width: min(100%, calc(100vw - 14px));
+    padding-top: 8px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .stamp-frame {
+    width: min(70vw, 210px);
+  }
+
+  .font-grid,
+  .font-grid.compact {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-row,
+  .solid-row,
+  .background-gradient-controls .preset-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
